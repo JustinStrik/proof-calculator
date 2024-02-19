@@ -19,6 +19,16 @@ import argparse
 
 # write a parser for the grammar
 
+# write grammar
+# Equation ::= Expression = Expression
+# Expression ::= Term + Term | Term - Term | Term
+# Term ::= Factor * Factor | Factor / Factor | Factor
+# Function ::= sin(Expression) | cos(Expression) | tan(Expression) | exp(Expression) | log(Expression) | sqrt(Expression) | pi | e | sum(Expression) | mod(Expression) | integral(Expression) | derivative(Expression)
+# Number ::= [0-9]+
+# Parentheses ::= ( Expression )
+# Operation ::= + | - | * | / | ^ | !
+# Function ::= sin | cos | tan | exp | log | sqrt | pi | e | sum | mod | integral | derivative Parentheses
+
 class Node:
     def __init__(self, token_type, value=None):
         self.token_type = token_type
@@ -48,10 +58,10 @@ class TokenType(enum.Enum):
     T_DERIVATIVE = 19
     T_END = 20
 
-class Token:
-    def __init__(self, type, value):
-        self.type = type
-        self.value = value
+# class Token:
+#     def __init__(self, type, value):
+#         self.type = type
+#         self.value = value
 
 mappings = {
     '+': TokenType.T_PLUS,
@@ -76,60 +86,48 @@ mappings = {
 }
 
 def lexical_analysis(s):
-    mappings = {
-        '+': TokenType.T_PLUS,
-        '-': TokenType.T_MINUS,
-        '*': TokenType.T_MULT,
-        '/': TokenType.T_DIV,
-        '(': TokenType.T_LPAR,
-        ')': TokenType.T_RPAR,
-        '^': TokenType.T_EXP,
-        '!': TokenType.T_FACT
-    }
-
     tokens = []
-    # for c in s:
-    #     if c in mappings:
-    #         token_type = mappings[c]
-    #         token = Node(token_type, value=c)
-    #     elif re.match(r'\d', c):  
-    #         token = Node(TokenType.T_NUM, value=int(c))
-    #     # ignore whitespace
-    #     elif c == ' ' or c == '\t' or c == '\n' or c == '\r':
-    #         continue
-    #     else:
-    #         raise Exception('Invalid token: {}'.format(c))
-    #     tokens.append(token)
-    # tokens.append(Node(TokenType.T_END))
-    # return tokens
 
     # change to work for multi-digit numbers and multi-letter functions
     i = 0
     while i < len(s):
         c = s[i]
+        # check single character tokens
         if c in mappings:
             token_type = mappings[c]
-            token = Token(token_type, c)
+            token = Node(token_type, c)
             tokens.append(token)
             i += 1
         elif re.match(r'\d', c):
             j = i
             while j < len(s) and re.match(r'\d', s[j]):
                 j += 1
-            token = Token(TokenType.T_NUM, int(s[i:j]))
+            token = Node(TokenType.T_NUM, int(s[i:j]))
             tokens.append(token)
             i = j
         elif re.match(r'[a-zA-Z]', c):
             j = i
             while j < len(s) and re.match(r'[a-zA-Z]', s[j]):
                 j += 1
-            token = Token(TokenType.T_SIN, s[i:j])
-            tokens.append(token)
+                # token = Node(TokenType.T_SIN, s[i:j])
+                if (s[i:j] in mappings): # if the function is in the mappings
+                    token = Node(mappings[s[i:j]], s[i:j])
+                      # if any that requires parentheses
+                    tokens.append(token)
+                    if (token.token_type == TokenType.T_SIN or token.token_type == TokenType.T_COS or token.token_type == TokenType.T_TAN or token.token_type == TokenType.T_LOG or token.token_type == TokenType.T_SQRT or token.token_type == TokenType.T_SUM or token.token_type == TokenType.T_INTEGRAL or token.token_type == TokenType.T_DERIVATIVE):
+                        j = j + 1
+                        if (s[j] != '('):
+                            raise Exception('Invalid syntax on token {}'.format(s[j]) + ', need parentheses with no whitespace after function name')
+                        token.children.append(parse_e(tokens)) # will end on the last parentheses, so dont need to check
             i = j
         elif c == ' ' or c == '\t' or c == '\n' or c == '\r':
             i += 1
+        elif c == ')':
+            return tokens
         else:
             raise Exception('Invalid token: {}'.format(c))
+    tokens.append(Node(TokenType.T_END, None))
+    return tokens
 
 def match(tokens, token):
     if tokens[0].token_type == token:
@@ -165,9 +163,7 @@ def parse_e3(tokens):
     # if tokens[0].token_type == TokenType.T_NUM:
     #     return tokens.pop(0)
     # rewrite so it doesnt throw an error when null
-    if len(tokens) == 0:
-        return None
-    elif tokens[0].token_type == TokenType.T_NUM:
+    if tokens[0].token_type == TokenType.T_NUM:
         return tokens.pop(0)
 
     match(tokens, TokenType.T_LPAR)
@@ -184,7 +180,7 @@ def parse(inputstring):
     return ast
 
 if __name__ == '__main__':
-    inputstring = '23 * (3 + 4)'
+    inputstring = 'sin(10*4)'
     ast = parse(inputstring)
     print(ast)
 

@@ -1,0 +1,12 @@
+graph ""
+{
+n1 [label="*"] ;
+n1 -- n2 ;
+n2 [label="23"] ;
+n1 -- n3 ;
+n3 [label="+"] ;
+n3 -- n4 ;
+n4 [label="3"] ;
+n3 -- n5 ;
+n5 [label="4"] ;
+}
