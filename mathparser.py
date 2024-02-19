@@ -5,6 +5,7 @@ import math
 import re
 import sys
 import argparse
+from node import *
 
 # define the grammar
 # include exp, log, sin, cos, tan, sqrt, and pi, e, sum, mod, factorial, integral, derivative, parentheses, and the basic operations
@@ -20,20 +21,18 @@ import argparse
 # write a parser for the grammar
 
 # write grammar
-# Equation ::= Expression = Expression
-# Expression ::= Term + Term | Term - Term | Term
-# Term ::= Factor * Factor | Factor / Factor | Factor
-# Function ::= sin(Expression) | cos(Expression) | tan(Expression) | exp(Expression) | log(Expression) | sqrt(Expression) | pi | e | sum(Expression) | mod(Expression) | integral(Expression) | derivative(Expression)
-# Number ::= [0-9]+
+# Equation ::= Expression | = Expression
+# PowExpr ::= AdditiveExpr ** PowExpr |   AdditiveExpr
+# AdditiveExpr ::= MultiplicativeExpr ( ( + | - ) MultiplicativeExpr )*
+# MultiplicativeExpr ::= Function (( * | / | % ) Function)*
+# Function ::= - | sin(Expression) | cos(Expression) | tan(Expression) | exp(Expression) | log(Expression) | sqrt(Expression) | pi | e | sum(Expression) | mod(Expression) | integral(Expression) | derivative(Expression)
+# PrimaryExpr ::= Number ( Expr ) | Z |
+# x | y | a | r | inf
+# Number ::= [0-9]+ | [0-9]+.[0-9]+ | [0-9]+. | .[0-9]+ | 0. | 0 | 0.0 | 0.0
 # Parentheses ::= ( Expression )
 # Operation ::= + | - | * | / | ^ | !
 # Function ::= sin | cos | tan | exp | log | sqrt | pi | e | sum | mod | integral | derivative Parentheses
-
-class Node:
-    def __init__(self, token_type, value=None):
-        self.token_type = token_type
-        self.value = value
-        self.children = []
+        
 
 class TokenType(enum.Enum):
     T_NUM = 0
@@ -115,10 +114,9 @@ def lexical_analysis(s):
                       # if any that requires parentheses
                     tokens.append(token)
                     if (token.token_type == TokenType.T_SIN or token.token_type == TokenType.T_COS or token.token_type == TokenType.T_TAN or token.token_type == TokenType.T_LOG or token.token_type == TokenType.T_SQRT or token.token_type == TokenType.T_SUM or token.token_type == TokenType.T_INTEGRAL or token.token_type == TokenType.T_DERIVATIVE):
-                        j = j + 1
                         if (s[j] != '('):
                             raise Exception('Invalid syntax on token {}'.format(s[j]) + ', need parentheses with no whitespace after function name')
-                        token.children.append(parse_e(tokens)) # will end on the last parentheses, so dont need to check
+                        token.children.append(lexical_analysis(tokens)) # will end on the last parentheses, so dont need to check
             i = j
         elif c == ' ' or c == '\t' or c == '\n' or c == '\r':
             i += 1
@@ -134,8 +132,7 @@ def match(tokens, token):
         return tokens.pop(0)
     else:
         raise Exception('Invalid syntax on token {}'.format(tokens[0].token_type))
-
-
+    
 def parse_e(tokens):
     left_node = parse_e2(tokens)
 
@@ -183,8 +180,3 @@ if __name__ == '__main__':
     inputstring = 'sin(10*4)'
     ast = parse(inputstring)
     print(ast)
-
-
-
-
-
