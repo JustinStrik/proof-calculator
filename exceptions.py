@@ -3,15 +3,15 @@
 # Lexical, Syntax, TypeCheck
 # write a function to raise exceptions and when to raise them
 
-class LexicalError(Exception):
+class LexicalException(Exception):
     def __init__(self, message):
         self.message = message
 
-class SyntaxError(Exception):
+class SyntaxException(Exception):
     def __init__(self, message):
         self.message = message
 
-class TypeCheckError(Exception):
+class TypeCheckException(Exception):
     def __init__(self, message):
         self.message = message
 

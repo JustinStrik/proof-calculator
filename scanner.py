@@ -1,3 +1,5 @@
+from token_ import Token
+from exceptions import *
 # package edu.ufl.cise.plcsp23;
 
 # import java.util.Arrays;
@@ -454,7 +456,10 @@ class Scanner():
     def isDigit(self, ch):
         return '0' <= ch and ch <= '9'
     
-    def Scanner(self, input):
+    def isLetter(self, ch):
+        return ('A' <= ch and ch <= 'Z') or ('a' <= ch and ch <= 'z')
+    
+    def __init__(self, input):
         self.input = input
         self.ch = self.input[self.pos]
 
@@ -471,6 +476,241 @@ class Scanner():
             self.ch = 0
         else:
             self.ch = self.input[self.pos]
+
+#             while(true) { 
+#             //read chars, loop terminates when a Token is returned             
+#             switch(state) {
+#                 case START: {
+#                     tokenStart = pos;
+#                     switch(ch) {
+#                         // end of input
+#                         case 0: 
+#                             return new Token(Token.Kind.EOF, tokenStart, 0, inputChars);
+#                         // handle white space, new line, tab, etc.
+#                         case ' ','\n','\r','\t','\f':
+#                             nextChar(); 
+#                             continue;
+#                         case '.':
+#                             nextChar();
+#                             return new Token(Token.Kind.DOT, tokenStart, 1, inputChars);
+#                         case ',':
+#                             nextChar();
+#                             return new Token(Token.Kind.COMMA, tokenStart, 1, inputChars);
+#                         case '?':
+#                             nextChar();
+#                             return new Token(Token.Kind.QUESTION, tokenStart, 1, inputChars);
+#                         case ':':
+#                             nextChar();
+#                             return new Token(Token.Kind.COLON, tokenStart, 1, inputChars);
+#                         case '(':
+#                             nextChar();
+#                             return new Token(Token.Kind.LPAREN, tokenStart, 1, inputChars);
+#                         case ')':
+#                             nextChar();
+#                             return new Token(Token.Kind.RPAREN, tokenStart, 1, inputChars);
+#                         case '<':
+#                             nextChar();
+#                             if (ch == '-') {
+#                                 nextChar();
+#                                 if (ch == '>') {
+#                                     nextChar();
+#                                     return new Token(Token.Kind.EXCHANGE, tokenStart, 3, inputChars);
+#                                 }
+#                                 else {
+#                                     throw new LexicalException(
+#                                         "Illegal Exchange" );
+#                                 }
+                            
+#                             }
+#                             else if (ch == '=') {
+#                                 nextChar();
+#                                 return new Token(Token.Kind.LE, tokenStart, 2, inputChars);
+#                             }
+#                             else {
+#                                 return new Token(Token.Kind.LT, tokenStart, 1, inputChars);
+#                             }
+#                         case '>':
+#                             nextChar();
+#                             if (ch == '=') {
+#                                 nextChar();
+#                                 return new Token(Token.Kind.GE, tokenStart, 2, inputChars);
+#                             }
+#                             return new Token(Token.Kind.GT, tokenStart, 1, inputChars);
+#                         case '[':
+#                             nextChar();
+#                             return new Token(Token.Kind.LSQUARE, tokenStart, 1, inputChars);
+#                         case ']':
+#                             nextChar();
+#                             return new Token(Token.Kind.RSQUARE, tokenStart, 1, inputChars);
+#                         case '{':
+#                             nextChar();
+#                             return new Token(Token.Kind.LCURLY, tokenStart, 1, inputChars);
+#                         case '}':
+#                             nextChar();
+#                             return new Token(Token.Kind.RCURLY, tokenStart, 1, inputChars);
+#                         case '=': 
+#                             state = State.HAVE_EQ;
+#                             nextChar();
+#                             continue;
+#                         case '!':
+#                             nextChar();
+#                             return new Token(Token.Kind.BANG, tokenStart, 1, inputChars);
+#                         case '&':
+#                             nextChar();
+#                             if (ch == '&') {
+#                                 nextChar();
+#                                 return new Token(Token.Kind.AND, tokenStart, 2, inputChars);
+#                             }
+#                             return new Token(Token.Kind.BITAND, tokenStart, 1, inputChars);
+#                         case '|':
+#                             nextChar();
+#                             if (ch == '|') {
+#                                 nextChar();
+#                                 return new Token(Token.Kind.OR, tokenStart, 2, inputChars);
+#                             }
+#                             return new Token(Token.Kind.BITOR, tokenStart, 1, inputChars);
+#                         case '+':
+#                             nextChar();
+#                             return new Token(Token.Kind.PLUS, tokenStart, 1, inputChars);
+#                         case '-':
+#                             nextChar();
+#                             return new Token(Token.Kind.MINUS, tokenStart, 1, inputChars);
+#                         case '*': 
+#                             nextChar();
+#                             if (ch == '*') {
+#                                 nextChar();
+#                                 return new Token(Token.Kind.EXP, tokenStart, 2, inputChars);
+#                             }
+#                             return new Token(Token.Kind.TIMES, tokenStart, 1, inputChars);
+#                         case '/':
+#                             nextChar();
+#                             return new Token(Token.Kind.DIV, tokenStart, 1, inputChars);
+#                         case '%':
+#                             nextChar();
+#                             return new Token(Token.Kind.MOD, tokenStart, 1, inputChars);
+#                         // check for string lit
+#                         case '"':
+#                             state = State.IN_STRING_LIT;
+#                             nextChar();
+#                             continue;
+#                         case '0': 
+#                             nextChar();
+#                             return new Token(Token.Kind.NUM_LIT, tokenStart, 1, inputChars);
+#                         case '1', '2', '3', '4', '5', '6', '7', '8', '9':
+#                             state = State.IN_NUM_LIT;
+#                             nextChar();
+#                             continue;
+#                         // isIdentStart does not work with case since it returns a boolean
+#                         case 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','_','$': // all possible starts to in_ident
+#                             state = State.IN_IDENT;
+#                             nextChar();
+#                             continue;
+#                         case '~':
+#                             nextChar();
+#                             state = State.COMMENT;
+#                             continue;
+#                         default: 
+#                             // once all is implemented, should just be Not(a..z,A..Z,$,_,0..9, +,*,=)
+#                             throw new LexicalException(
+#                                 "Not a valid character" 
+#                             );
+#                     }
+#                 }
+#                 case HAVE_EQ: {
+#                     if (ch == '=') {
+#                         nextChar();
+#                         return new Token(Token.Kind.EQ, tokenStart, 2, inputChars);
+#                     } 
+#                     else {
+#                         return new Token(Token.Kind.ASSIGN, tokenStart, 1, inputChars);
+#                     }
+
+#                 }
+#                 case IN_NUM_LIT: {
+#                     if (isDigit(ch)) {
+#                         nextChar();
+#                     } else {
+#                         int length = pos - tokenStart;
+#                         state = State.START; 
+#                         return new Token(Token.Kind.NUM_LIT, tokenStart, length, inputChars);
+#                     }
+#                     continue;
+#                 }
+#                 case IN_IDENT: {
+#                     switch (ch) {
+#                         // all possible continuations of in_ident, now including digits
+#                         case 'a','b','c','d','e','f','g','h','i','j','k','l','m','n','o','p','q','r','s','t','u','v','w','x','y','z','A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','_','$','0','1','2','3','4','5','6','7','8','9': 
+#                             nextChar();
+#                             continue;
+#                         default: {
+#                             int length = pos - tokenStart;
+#                             state = State.START; // need to reset state after token is found
+#                             return new Token(Token.Kind.IDENT, tokenStart, length, inputChars);
+#                         }
+#                     }
+#                 }
+#                 case COMMENT: {
+#                     switch (ch) {
+#                         case '\n':
+#                             nextChar();
+#                             state = State.START;
+#                             continue;
+#                         default:
+#                             nextChar();
+#                             continue;
+#                     }
+#                 }
+#                 case IN_STRING_LIT:
+#                     switch (ch) {
+#                         case 0:
+#                             throw new LexicalException("Illegal character in string lit, EOF, invalid post-\\: " + pos);
+#                         case '"':
+#                             nextChar();
+#                             state = State.START;
+#                             return new StringToken(Token.Kind.STRING_LIT, tokenStart, pos - tokenStart, inputChars);
+#                             // continue;
+#                         case '\\':
+#                             nextChar();
+#                             switch (ch) {
+#                                 case 'b':
+#                                     nextChar();
+#                                     continue;
+#                                 case 't':
+#                                     nextChar();
+#                                     continue;
+#                                 case 'n':
+#                                     nextChar();
+#                                     continue;
+#                                 case 'r':
+#                                     nextChar();
+#                                     continue;
+#                                 case '\"':
+#                                     nextChar();
+#                                     continue;
+#                                 case '\\':
+#                                     nextChar();
+#                                     continue;
+#                                 default:
+#                                     throw new LexicalException("Illegal character in string lit, invalid post-\\: " + pos);
+#                             }
+#                         case '\n', '\r': 
+#                             // make own tests for these !!!??? '\t', '\b', '\f' // these are illegal in string lit
+#                             throw new LexicalException("Illegal character in string lit, newline: " + pos);
+                        
+#                         default:
+#                             nextChar();
+#                             continue;
+#                     }
+
+                    
+#                 default: {
+#                     // could also change to "not implemented yet", as suggested in the slides
+#                     throw new UnsupportedOperationException("Bug in Scanner");
+#                 }
+#             }
+#         }
+#     }
+# }
 
     # Equation ::= Expression | = Expression
 # PowExpr ::= AdditiveExpr ** PowExpr |   AdditiveExpr
@@ -497,3 +737,82 @@ class Scanner():
                     match(self.ch):
                         case 0:
                             return Token(Token.Kind.END, tokenStart, 0, self.input)
+                        case ' ', '\n', '\r', '\t', '\f':
+                            self.nextChar()
+                            continue
+                        case '.':
+                            self.nextChar()
+                            continue
+                        case ',':
+                            self.nextChar()
+                            continue
+                        case '(':
+                            self.nextChar()
+                            return Token(Token.Kind.RPAR, tokenStart, 1, self.input)
+                        case ')':
+                            self.nextChar()
+                            return Token(Token.Kind.LPAR, tokenStart, 1, self.input)
+                        case '<':
+                            self.nextChar()
+                            return Token(Token.Kind.LT, tokenStart, 1, self.input)
+                        case '>':
+                            self.nextChar()
+                            return Token(Token.Kind.GT, tokenStart, 1, self.input)
+                        case '=':
+                            self.nextChar()
+                            return Token(Token.Kind.EQ, tokenStart, 1, self.input)
+                        case '!':
+                            self.nextChar()
+                            return Token(Token.Kind.FACT, tokenStart, 1, self.input)
+                        case '~':
+                            self.nextChar()
+                            return Token(Token.Kind.NOT, tokenStart, 1, self.input)
+                        case '+':
+                            self.nextChar()
+                            return Token(Token.Kind.PLUS, tokenStart, 1, self.input)
+                        case '-':
+                            self.nextChar()
+                            return Token(Token.Kind.MINUS, tokenStart, 1, self.input)
+                        case '*':
+                            self.nextChar()
+                            return Token(Token.Kind.MULT, tokenStart, 1, self.input)
+                        case '/':
+                            self.nextChar()
+                            return Token(Token.Kind.DIV, tokenStart, 1, self.input)
+                        case '%':
+                            self.nextChar()
+                            return Token(Token.Kind.MOD, tokenStart, 1, self.input)
+                        case '^':
+                            self.nextChar()
+                            return Token(Token.Kind.EXP, tokenStart, 1, self.input)
+                        case '0':
+                            self.nextChar()
+                            return Token(Token.Kind.NUM, tokenStart, 1, self.input)
+                        case '1' | '2' | '3' | '4' | '5' | '6' | '7' | '8' | '9':
+                            state = self.State.IN_NUM_LIT
+                            self.nextChar()
+                            continue
+                        # case 'a', 'b', 'c', 'd', 'e', 'f', 'g', 'h', 'i', 'j', 'k', 'l', 'm', 'n', 'o', 'p', 'q', 'r', 's', 't', 'u', 'v', 'w', 'x', 'y', 'z', 'A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z', '_', '$':
+                        case 'a' | 'b' | 'c' | 'd' | 'e' | 'f' | 'g' | 'h' | 'i' | 'j' | 'k' | 'l' | 'm' | 'n' | 'o' | 'p' | 'q' | 'r' | 's' | 't' | 'u' | 'v' | 'w' | 'x' | 'y' | 'z' | 'A' | 'B' | 'C' | 'D' | 'E' | 'F' | 'G' | 'H' | 'I' | 'J' | 'K' | 'L' | 'M' | 'N' | 'O' | 'P' | 'Q' | 'R' | 'S' | 'T' | 'U' | 'V' | 'W' | 'X' | 'Y' | 'Z' | '_' | '$': 
+                            state = self.State.IN_IDENT # function for this language
+                            self.nextChar()
+                            continue
+                        # default:
+                        #     raise Exception("Not a valid character")
+                        # python equivalent of default
+                        case _:
+                            raise LexicalException("Not a valid character at " + str(self.pos) + "\nInvalid char was: " + self.ch)
+                case self.State.IN_NUM_LIT:
+                    if self.isDigit(self.ch):
+                        self.nextChar()
+                    else:
+                        length = self.pos - tokenStart
+                        state = self.State.START
+                        return Token(Token.Kind.NUM, tokenStart, length, self.input)
+                case self.State.IN_IDENT:
+                    if self.isLetter(self.ch):
+                        self.nextChar()
+                    else:
+                        length = self.pos - tokenStart
+                        state = self.State.START
+                        return Token(Token.Kind.IDENT, tokenStart, length, self.input)

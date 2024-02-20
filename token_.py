@@ -158,28 +158,7 @@
 # Function ::= sin | cos | tan | exp | log | sqrt | pi | e | sum | mod | integral | derivative Parentheses
         
 # kind
-class Kind():
-    T_NUM = 0
-    T_PLUS = 1
-    T_MINUS = 2
-    T_MULT = 3
-    T_DIV = 4
-    T_LPAR = 5
-    T_RPAR = 6
-    T_EXP = 7
-    T_FACT = 8
-    T_SIN = 9
-    T_COS = 10
-    T_TAN = 11
-    T_LOG = 12
-    T_SQRT = 13
-    T_PI = 14
-    T_E = 15
-    T_SUM = 16
-    T_MOD = 17
-    T_INTEGRAL = 18
-    T_DERIVATIVE = 19
-    T_END = 20
+
 
 class Token:
     #     public Token(Kind kind, int pos, int length, char[] source) throws LexicalException {
@@ -191,6 +170,36 @@ class Token:
     tokenLine = None
     tokenColumn = None
     reservedWords = None
+
+    class Kind():
+        NUM = 0
+        PLUS = 1
+        MINUS = 2
+        MULT = 3
+        DIV = 4
+        LPAR = 5
+        RPAR = 6
+        EXP = 7
+        FACT = 8
+        SIN = 9
+        COS = 10
+        TAN = 11
+        LOG = 12
+        SQRT = 13
+        PI = 14
+        E = 15
+        SUM = 16
+        MOD = 17
+        INTEGRAL = 18
+        DERIVATIVE = 19
+        END = 20
+        LT = 21
+        GT = 22
+        LE = 23
+        GE = 24
+        EQ = 25
+        NOT = 26
+        IDENT = 27
 
     def __init__(self, kind, pos, length, source):
         self.kind = kind
@@ -211,6 +220,19 @@ class Token:
                 lastNewLine = i + 1
         self.tokenLine = line
         self.tokenColumn = pos - lastNewLine + 1
+
+        if kind == self.Kind.IDENT:
+            s = ''.join(source[pos:pos+length])
+            if s in self.reservedWords:
+                self.kind = self.reservedWords[s]
+            else:
+                self.kind = kind
+
+        if kind == self.Kind.NUM:
+            try:
+                self.value = int(''.join(source[pos:pos+length]))
+            except Exception as e:
+                raise LexicalException("Invalid number literal, position:" + pos)
 
     def getSourceLocation(self):
         return [self.tokenLine, self.tokenColumn]
